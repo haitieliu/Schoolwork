@@ -1,0 +1,20 @@
+population=rchisq(10000000,2)
+hist(population)
+mean(population)
+sd(population)
+
+sample=rnorm(50,mean(population),sd(population))
+hist(sample)
+mean(sample)
+
+
+
+xbarholder=numeric(10000)
+xbar=mean(sample)
+
+i=0
+for (i in 1:10000)
+    i=i+1
+    xbarholder=c(xbarholder,xbar)
+    
+xbarholder
