@@ -12,9 +12,10 @@ mean(sample)
 xbarholder=numeric(10000)
 xbar=mean(sample)
 
-i=0
+
 for (i in 1:10000)
-    i=i+1
-    xbarholder=c(xbarholder,xbar)
+    sample=rnorm(50,mean(population),sd(population))
+    xbar=mean(sample)
+    xbarholder[i]=xbar
     
 xbarholder
