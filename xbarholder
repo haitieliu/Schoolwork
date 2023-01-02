@@ -19,3 +19,32 @@ for (i in 1:10000)
     xbarholder[i]=xbar
     
 xbarholder
+
+
+
+
+
+
+#######################################################SECONDTRIAL
+n1 = 10 
+
+simulations = 1000 
+mu = 0
+sigma = 1
+
+hist(1,2,3,4,5)
+xbar_holder1 = numeric(simulations) 
+
+
+
+for (i in 1:simulations)
+  
+  sample1 = rnorm(n1,mean = mu, sd = sigma)
+  hist(sample1)
+  xbar1 = mean(sample1)
+
+  xbar_holder1[i] = xbar1
+
+
+par(mfrow = c(2,1))
+hist(xbar_holder1, col = "blue", main = paste("Distribution of the sample mean: n = ", n1), xlab = "Dist 1 Sample Means", xlim = c(-4,4))
