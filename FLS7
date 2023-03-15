@@ -1,0 +1,196 @@
+library(rjson)
+library(GGally)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(tidyverse)
+library(plyr)
+library(patchwork)
+library(class)
+library(caret)
+library(e1071)
+
+
+#####Native Bays for Pclass and age
+Titanic=read.csv(file.choose(),header = TRUE)
+TitanicNB=naiveBayes(Titanic[,c(3,6)],Titanic$Survived)
+df1=data.frame(Pclass=1,Age=30)
+df2=data.frame(Pclass=2,Age=30)
+df3=data.frame(Pclass=3,Age=30)
+Titanic$Age=as.numeric(Titanic$Age)
+Titanic$Pclass=as.numeric(Titanic$Pclass)
+predict(TitanicNB,df1,Titanic$Survived,type = "raw")
+predict(TitanicNB,df2,Titanic$Survived,type = "raw")
+predict(TitanicNB,df3,Titanic$Survived,type = "raw")
+
+
+
+####problem 2
+
+titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+
+set.seed(4)
+
+trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+
+trainTitanic = titanicClean[trainIndices,]
+
+testTitanic = titanicClean[-trainIndices,]
+
+
+model=naiveBayes(trainTitanic[,c(3,6)],trainTitanic$Survived)
+result=predict(model,testTitanic[,c(3,6)],testTitanic$Survived,type = NULL)
+CM=confusionMatrix(table(result,testTitanic$Survived))
+
+trainTitanic1=drop_na(trainTitanic)
+testTitanic1=drop_na(testTitanic)
+C1=knn(trainTitanic1[,c(3,6)],testTitanic1[,c(3,6)],trainTitanic1$Survived,k=15)
+CM1=confusionMatrix(table(C1,testTitanic1$Survived))
+
+
+
+#########Problem 3
+
+
+titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+
+trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+
+trainTitanic = titanicClean[trainIndices,]
+
+testTitanic = titanicClean[-trainIndices,]
+
+
+CMN=numeric(4)
+CMSEN=numeric(4)
+CMSPE=numeric(4)
+
+for (i in 1:4){
+  
+  titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+  
+  trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+  
+  trainTitanic = titanicClean[trainIndices,]
+  
+  testTitanic = titanicClean[-trainIndices,]
+  
+model=naiveBayes(trainTitanic[,c(3,6)],trainTitanic$Survived)
+result=predict(model,testTitanic[,c(3,6)],testTitanic$Survived,type = NULL)
+CM=confusionMatrix(table(result,testTitanic$Survived))
+CMN[i]=CM$overall[1]
+CMSEN[i]=CM$byClass[1]
+CMSPE[i]=CM$byClass[2]
+}
+
+sets=data.frame(CMN,CMSEN,CMSPE)
+
+var(sets$CMN)
+var(sets$CMSEN)
+var(sets$CMSPE)
+
+
+
+###########Problem 4
+
+CMN=numeric(100)
+CMSEN=numeric(100)
+CMSPE=numeric(100)
+
+for (i in 1:100){
+  
+  titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+  
+  trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+  
+  trainTitanic = titanicClean[trainIndices,]
+  
+  testTitanic = titanicClean[-trainIndices,]
+  
+  model=naiveBayes(trainTitanic[,c(3,6)],trainTitanic$Survived)
+  result=predict(model,testTitanic[,c(3,6)],testTitanic$Survived,type = NULL)
+  CM=confusionMatrix(table(result,testTitanic$Survived))
+  CMN[i]=CM$overall[1]
+  CMSEN[i]=CM$byClass[1]
+  CMSPE[i]=CM$byClass[2]
+}
+
+sets=data.frame(CMN,CMSEN,CMSPE)
+
+var(sets$CMN)
+var(sets$CMSEN)
+var(sets$CMSPE)
+
+mean(sets$CMN)
+mean(sets$CMSEN)
+mean(sets$CMSPE)
+
+
+################ second slide
+
+titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+
+set.seed(4)
+
+trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+
+trainTitanic = titanicClean[trainIndices,]
+
+testTitanic = titanicClean[-trainIndices,]
+
+
+model=naiveBayes(trainTitanic[,c(3,5,6)],trainTitanic$Survived)
+result=predict(model,testTitanic[,c(3,5,6)],testTitanic$Survived,type = NULL)
+CM=confusionMatrix(table(result,testTitanic$Survived))
+
+
+
+############# problem 2
+
+
+CMN=numeric(100)
+CMSEN=numeric(100)
+CMSPE=numeric(100)
+
+for (i in 1:100){
+  
+  titanicClean = Titanic %>% filter(!is.na(Age) & !is.na(Pclass))
+  
+  trainIndices = sample(seq(1:length(titanicClean$Age)),round(.7*length(titanicClean$Age)))
+  
+  trainTitanic = titanicClean[trainIndices,]
+  
+  testTitanic = titanicClean[-trainIndices,]
+  
+  model=naiveBayes(trainTitanic[,c(3,5,6)],trainTitanic$Survived)
+  result=predict(model,testTitanic[,c(3,5,6)],testTitanic$Survived,type = NULL)
+  CM=confusionMatrix(table(result,testTitanic$Survived))
+  CMN[i]=CM$overall[1]
+  CMSEN[i]=CM$byClass[1]
+  CMSPE[i]=CM$byClass[2]
+}
+
+sets=data.frame(CMN,CMSEN,CMSPE)
+
+var(sets$CMN)
+var(sets$CMSEN)
+var(sets$CMSPE)
+
+mean(sets$CMN)
+mean(sets$CMSEN)
+mean(sets$CMSPE)
+
+
+#####problem 3
+
+
+
+df1 <- data.frame(c("Accuracy","Accuracy", "Sensitivity","Sensitivity", "Specificity","Specificity"), c(0.95,0.6770,1.0000,0.4286,0.8667,1.0000), c("headline","snippet","headline","snippet","headline","snippet"))
+colnames(df1) <- c("stats", "Value", "Category")
+
+df1 %>%
+  ggplot() + geom_bar(data = df1, aes(x = stats, y =Value, fill =Category), position = "dodge", stat = "identity")+
+  ggtitle("Headline vs. Snippet")
+
+         
