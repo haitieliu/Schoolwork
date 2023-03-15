@@ -1,0 +1,184 @@
+PlayersBBall
+
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+
+
+ggplot(PlayersBBall,aes(x=position))+geom_bar()+
+  ggtitle("Number Of Players In Each Position")+xlab("Position")+ylab("Count")+
+  theme_bw()
+
+
+ggplot(PlayersBBall$position=C)
+
+ggplot(PlayersBBall,aes(x=position,y=weight,col=position))+
+  geom_point()+theme_bw()+
+  ggtitle("Weight\"C\" vs. Weight\"F\"")
+
+ggplot(PlayersBBall,aes(x=position,y=height,col=position))+
+  geom_point()+theme_bw()+
+  ggtitle("Height\"C\" vs. Height\"F\"")
+
+
+
+
+ggplot(PlayersBBall,aes(x=position,y=height,col=position))+
+  geom_point(position="jitter")+theme_bw()+
+  ggtitle("Difference Between Height Among All Positions")
+
+################################################
+#Split two columns and manipulated two columns into 1
+
+
+PlayersBBall$height=as
+
+PlayersBBall1=separate(PlayersBBall,col=height,into = c("foot","inch"),sep="-")
+
+transform(PlayersBBall1,foot=as.numeric(foot),inch=as.numeric(inch))
+
+class(PlayersBBall1$foot)
+
+PlayersBBall1$inch=as.numeric(PlayersBBall1$foot)*12+as.numeric(PlayersBBall1$inch)
+
+colnames(PlayersBBall1)[6]="Height"
+
+PlayersBBall1
+
+
+##############################################################
+
+###Relationship Between Height vs. Weight###
+
+ggplot(PlayersBBall1,aes(Height,weight))+
+  geom_point()+
+  geom_smooth()+
+  ggtitle("Height vs. Weight")
+
+
+###Height vs. Weight in Each Position####
+
+ggplot(PlayersBBall1,aes(Height,weight,col=position))+
+  geom_point()+
+  geom_smooth()+
+  ggtitle("Height vs. Weight in Each Position")+
+  facet_wrap(~position)
+
+
+####Height vs Years#######
+
+class(PlayersBBall$birth_date)
+
+
+
+ggplot(PlayersBBall1,aes(as.numeric(years),Height))+
+  geom_point()+geom_smooth()+
+  ggtitle("Height vs Birthday")+xlab("Birthday")+ylab("Height in inch")+geom_en
+
+
+
+### seperate birht and date, as using as.numeric to compute geom_smooth
+##IAM A GENIUS!!!lol!Thank God!
+
+PlayersBBall1=separate(PlayersBBall1,col=birth_date, into = c("date","years"),sep=",")+geom_encircle
+
+
+
+####################################################################################
+
+
+###############3D PLOT##################
+plot_ly(PlayersBBall,x=~height,y=~weight,z=~year_start,color=~position)
+  layout(scene=list(xaxis=list(title = "Height"),
+                    yaxis=list(title = "Weight"),
+                    zaxis = list(title "Year_Start")))
+
+
+
+install.packages("plotly")
+######################################################################################
+
+
+############USING TOP 50 CHARTS##########################################
+library(ggplot2)
+library(ggcorrplot)
+install_github("kassambara/ggcorrplot")
+
+
+
+pie=ggplot(PlayersBBall1,aes(x="",fill=factor(position)))+
+  geom_bar()
+
+pie+coord_polar(theta="y",start = 0)
+  
+############copied pie chart from http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html#1.%20Correlation  #########
+
+
+###############lastquestion##################
+
+
+library(readr)
+
+read_csv(C:/Users/Haiti/OneDrive/Documents/DSMS/Education_Income.csv)
+
+Education_Income1=Education_Income[-1,]
+
+
+Education_Income1
+
+class(Education_Income$V3)
+
+separate(Education_Income1,col = V2,into = c("first","last"),sep="-")
+
+Education_Income1=separate(Education_Income,col = V2,into = c("first","last"),sep="-")
+
+Education_Income2=separate(Education_Income1,col = first,into = c("first","t"),sep=">")
+
+Education_Income3=separate(Education_Income2,col = first,into = c("first","d"),sep="<")
+
+Education_Income1
+
+
+
+ggplot(Education_Income1)+
+  aes(x=as.numeric(Education),y=as.numeric(V3),color=Education)+
+  geom_point(position = "jitter")+
+  geom_smooth()+
+  ggtitle("Education v. Income")+xlab("Education Level")+ylab("Income Level")
+  
+Education_Income1     
+
+colnames(Education_Income1)[2]="Education"
+
+######################Finished############################
+
+
+
+
+
+
+
+
+
+
+
+
+
+data=read.csv(file.choose(),header=FALSE)
+
+read.csv("Education_Income.csv", header=FALSE)
+Education_Income
+
+ggplot(Education_Income,aes(x=V1,y=V3)+geom_point()
+       
+       
+       
+data=Education_Income
+names(data)=NULL
+
+data = read.csv(USERaiti\OneDrive\Documents\DSMS\Education_Income.csv,header=FALSE)
+
+
+
+       
+       
