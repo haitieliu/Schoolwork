@@ -1,0 +1,83 @@
+##############1############
+
+FIFAdata=read.csv(file.choose(),header = TRUE) 
+
+lmpluslf= FIFAdata %>%
+  filter(FIFAdata$Position == "LM" | FIFAdata$Position == 'LF' )
+
+lmpluslf=data.frame(lmpluslf)
+
+
+##########2##################
+
+
+FIFAdata %>%
+  filter(FIFAdata$Position == "LM" | FIFAdata$Position == 'LF') %>%
+  select(Acceleration, Agility, Position ) %>%
+  ggpairs(cardinality_threshold = NULL,aes (color= Position))
+
+
+##################################
+
+LMA = FIFAdata %>%
+  filter(FIFAdata$Position == "LM") %>%
+  select( Agility)
+
+LFA = FIFAdata %>%
+  filter(FIFAdata$Position == 'LF') %>%
+  select( Agility)
+
+mean(LMA$Agility)
+
+mean(LFA$Agility)
+  
+LFA 
+################################################
+
+sample1=rnorm(30,mean = mean(LMA$Agility), sd= sd(LMA$Agility))
+sample2=rnorm(30,mean =  mean(LFA$Agility), sd= sd(LFA$Agility))
+
+
+
+
+xbar_holder1=numeric(l=30)
+n1=30
+for( i in 1:30 ){
+  sample1=rnorm(30,mean = mean(LMA$Agility), sd= sd(LMA$Agility))
+  xbar1=mean(sample1)
+  xbar_holder1[i]=xbar1
+}
+xbar_holder1
+
+xbar_holder2=numeric(l=30)
+for( i in 1:30 ){
+  sample2=rnorm(30,mean = mean(LFA$Agility), sd= sd(LFA$Agility))
+  xbar2=mean(sample2)
+  xbar_holder2[i]=xbar2
+}
+xbar_holder2
+
+t.test(x=xbar_holder1,y=xbar_holder2)
+
+
+2.452e-14
+
+#######################################
+
+
+
+LMA%>%
+  ggplot(mapping = aes(x=Agility))+
+  geom_histogram()
+
+hist(LMA$Agility,main = 
+     "Histogram of LM's Agility",
+     xlab="Agility")
+
+hist(LFA$Agility,main = 
+       "Histogram of LF's Agility",
+     xlab="Agility")
+
+
+
+#########################################EDA
