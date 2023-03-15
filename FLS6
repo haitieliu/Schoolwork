@@ -1,0 +1,209 @@
+
+```{r}
+library(GGally)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(tidyverse)
+library(plyr)
+library(patchwork)
+
+
+####part1######
+
+PlayerBB=read.csv(file.choose(),header=TRUE)
+PlayerBB=separate(PlayerBB,height,into=c("feet","totalinch"),"-")
+PlayerBB[2143,5]="6"
+PlayerBB[2143,6]="2"
+PlayerBB[2143,4]="G"
+PlayerBB$totalinch=as.numeric(PlayerBB$feet)*12+as.numeric(PlayerBB$totalinch)
+PlayerBB$position=as.factor(PlayerBB$position)
+
+
+PlayerBB %>% 
+  ggplot(aes(x=position,y=totalinch),fill=position) +
+  geom_bar(stat = "identity")
+  
+
+```{r}
+
+########Part 2##############
+FIFA=read.csv(file.choose(),header = TRUE)
+
+class(FIFA$Position)
+sum(is.na(FIFA$Weight))
+
+FIFA=separate(FIFA,Height,into = c("feet","height"),sep = "'" )
+FIFA$feet=as.numeric(FIFA$feet)
+FIFA$height=FIFA$feet*12+as.numeric(FIFA$height)
+FIFA=drop_na(FIFA)
+FIFA$Weight=as.numeric(substr(FIFA$Weight,1,3))
+FIFA$Position=as.factor(FIFA$Position)
+
+
+FIFA %>%
+  select (height,Weight,Position) %>%
+  ggplot(aes(x=Weight,y=height),color=Position)+geom_point()+geom_smooth()+
+  ggtitle("Height vs. Weight") +ylab("Height")
+
+FIFA %>%
+  filter(Position == "LB" | Position == "LM") %>%
+  ggplot(aes(x=Weight,y=height),color=Position)+geom_point()+geom_smooth()+
+  ggtitle("Height  vs. Weight Between LB and LM") +ylab("Height")
+    
+```{r}
+
+###################Part 3, Question 1##########################
+
+df=read.table(file.choose(),header = FALSE)
+summary(df)
+structure(df)
+df=separate(df,V1,into = c("name","gender","number"),";")
+
+str_view(df$name,"yyy\\b") #looks like its df[212,] Fiona#
+df[-212,]
+df$number=as.numeric(df$number)
+y2016=arrange(df,desc(number))
+
+
+str_view(df$name,"mma\\b")
+df$number=as.numeric(df$number)
+df1 = aggregate(number ~ name,df,sum)
+
+# drop row
+
+
+################Question 2 ############################
+
+y2015=read.table(file.choose(),header = FALSE)
+y2015=separate(y2015,V1,into = c("name","gender","number"),",")
+
+tail(y2015,n=10)  
+#### last 10 row, have all gender male
+####total count of 5 and name starting with letter "Z"
+
+final = join(x=y2015,y=y2016, type= "inner",by = "name")
+
+
+
+
+  
+
+
+
+
+###########Question 3 ################################
+colnames(final)[2]="gender1"
+colnames(final)[3]="numberx"
+colnames(final)[4]="gender2"
+colnames(final)[5]="numbery"
+final$numberx=as.numeric(final$numberx)
+summary(final)
+
+final2=final %>%
+  group_by(name)%>%
+  filter(gender1==gender2)%>%
+  summarise(name,gender1,gender2,totalnumber=numberx+numbery) %>%
+  as.data.frame()
+
+final2=arrange(final2,desc(totalnumber))
+
+head(final2,10) #############top 10 popular names
+
+girlfinal=final2 %>%
+  filter(gender1 == "F" & gender2 == "F")
+
+head(girlfinal,10) #######Top 10 girl name
+
+final3=girlfinal[1:10,]
+write.csv(final3,"D:\\R")
+
+##############Question 4########################
+options(digits=2)
+
+final2=subset(final2,select = -c(gender2))
+finalall=final2[1:10,]
+finalall$gender1=as.factor(finalall$gender1)
+
+final3=subset(final3,select=-c(gender2))
+
+finalboys=final2%>%
+  filter(gender1== "M")
+finalboys=finalboys[1:10,]
+
+
+finalall%>%
+  ggplot(aes(x= name,  group=gender1)) + 
+  geom_bar(aes(y = totalnumber/sum(totalnumber), fill = gender1), stat="identity") +
+  scale_y_continuous(labels = scales::percent,)+
+  geom_text(aes( label = scales::percent(totalnumber/sum(totalnumber)),
+                y= totalnumber/sum(totalnumber) ), stat= "identity", vjust = -.5)+
+  ggtitle("Top 10 Most Polular Names") + xlab("Name")+ ylab("Percentage") +
+  scale_fill_discrete(name="Gender")+
+  ggthemes::theme_economist()
+
+plotgirl=final3 %>%
+  ggplot(aes(x=name))+
+  geom_bar(aes(y=totalnumber/sum(totalnumber)),fill="#FF9999",stat = "identity")+
+  scale_y_continuous(labels = scales::percent)+
+  geom_text(aes(label=scales::percent(totalnumber/sum(totalnumber)), 
+                y=totalnumber/sum(totalnumber)),stat = "identity", vjust= -.5)+
+  ggtitle("Top 10 Most Popular Girl's Name")+ xlab("Name") + ylab("Percentage")+
+  scale_fill_discrete(name="Gender")+
+  ggthemes::theme_economist_white()
+
+plotboy=finalboys%>%
+  ggplot(aes(x=name))+
+  geom_bar(aes(y=totalnumber/sum(totalnumber)),fill="cyan3",stat = "identity")+
+  scale_y_continuous(labels = scales::percent)+
+  geom_text(aes(label=scales::percent(totalnumber/sum(totalnumber)), 
+                y=totalnumber/sum(totalnumber)),stat = "identity", vjust= -.5)+
+  ggtitle("Top 10 Most Popular Boy's Name")+ xlab("Name") + ylab("Percentage")+
+  scale_fill_discrete(name="Gender")+
+  ggthemes::theme_economist_white()
+
+plotgirl+plotboy
+
+```{r}
+
+##################extra questions#############
+library(tidyverse)
+library(nycflights13)
+
+avg_dest_delays <-
+  flights %>%
+  group_by(dest) %>%
+  transmute(delay = mean(arr_delay,na.rm = TRUE)) %>% 
+  unique()%>%
+  inner_join(airports,by=c(dest="faa") )
+
+
+avg_dest_delays %>% 
+  ggplot(aes(lon, lat,color=delay)) + borders("state") + 
+  geom_point() + coord_quickmap()
+
+############question number 2
+testflight=flights
+colnames(avg_dest_delays)[1]="avgdelay"
+
+testflight=avg_dest_delays %>%
+  select(avgdelay,delay,lat,lon) %>%
+  right_join(testflight,by=c(avgdelay="dest"))
+
+###########question 3
+###Is there a relationship between the age of a plane and its delays?
+###I think there is, but I have no data to prove it
+
+##########question 4
+#What weather conditions make it more likely to see a delay?
+#anwser: rain
+
+##########question 5
+testflight=separate(testflight,time_hour,into=c("date","hour"),sep = " ")
+str(testflight$date)
+
+testflight%>%
+  filter(date=="2013-06-13")%>%
+  ggplot(aes(lon,lat,color=delay)) +borders("state")+
+  geom_point()+coord_quickmap()
