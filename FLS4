@@ -1,0 +1,64 @@
+########Web Scraping Tools ######
+
+
+library(XML) #xml_Parse
+library(dplyr)
+library(tidyr)
+library(stringi)
+library(rvest) #html_table, html_node
+library(ggplot2)
+library(RCurl) #getURL
+
+
+####XML#################
+
+
+data = read_html("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml")
+data
+data_nameR = html_nodes(data,"name")
+data_zipcodeR = html_nodes(data, "zipcode")
+data_cityR = html_nodes(data, "neighborhood")
+data_councildistrictR = html_nodes(data,"councildistrict")
+
+data_name= stri_sub(data_nameR,7,-8)
+head(data_name)
+
+data_zipcode = stri_sub(data_zipcodeR,10,-11)
+head(data_zipcode)
+
+data_city=stri_sub( data_cityR, 15,-16)
+head(data_city)
+
+data_councildistrict=stri_sub(data_councildistrictR, 18,-19)
+head(data_councildistrict)
+
+dataframe_RB=data.frame(data_name,data_city,data_zipcode,data_councildistrict)
+head(dataframe,n=1000)
+dataframe_RB
+
+####There are 9 SUSHI restaurant in total#####
+sushi=sum(grepl("SUSHI",dataframe_RB$data_name))
+sushi
+
+
+###############There are 277 restaurant in the downtown district
+dataframe_RB %>%
+  filter(data_councildistrict == 11) %>%
+  count()
+
+#################THERE ARE 1 SUSHI RESTAURANT IN DOWNTOWN AT INNER HARBOR#########################
+SUSHIDOWNTOWN=dataframe_RB %>%
+  filter(data_councildistrict == 11) 
+
+grep("SUSHI",SUSHIDOWNTOWN$data_name)
+
+#########################bar Plot##################################
+
+grep("SUSHI",dataframe_RB$data_name)
+
+DF=dataframe_RB[c(17,90,249,250,391,457,537,725,1137),]
+
+DF %>%
+  ggplot(aes(x=data_councildistrict)) +
+  geom_bar()+
+  ggtitle("Sushi Restaurant In Different District")+xlab("District")+ylab("Number")
