@@ -1,0 +1,96 @@
+library(rjson)
+library(GGally)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(tidyverse)
+library(plyr)
+library(patchwork)
+library(class)
+library(caret)
+library(e1071)
+
+######build classification############
+
+titanictrain=read.csv(file.choose(),header = TRUE)
+titanictest=read.csv(file.choose(),header = TRUE)
+
+classification1=knn.cv(titanictrain[,c(3,6)],titanictrain$Survived,k=3)
+
+sum(is.na(titanictrain$Survived))
+titanictrain=drop_na(titanictrain)
+titanictest=drop_na(titanictest)
+dim(titanictest)
+dim(titanictrain)
+
+######use my age and each ticket class#######
+
+dfTest=(c(Pclass=1,Age=29))
+dftest2=(c(Pclass=2,Age=29))
+dftest3=(c(Pclass=3,Age=29))
+
+titanictrain$Pclass=as.factor(titanictrain$Pclass)
+str(titanictrain)
+
+#age29,pclass1
+knn(titanictrain[,c(3,6)],dfTest,titanictrain$Survived,k=3)
+#age29,pclass2
+knn(titanictrain[,c(3,6)],dftest2,titanictrain$Survived,k=3)
+#age29,pclass3
+knn(titanictrain[,c(3,6)],dftest3,titanictrain$Survived,k=3)
+
+########choose randomly selected 418
+
+sampleindices=sample(1:dim(titanictrain)[1],418)
+sampletitianctrain=titanictrain[sampleindices,]
+
+classification=knn(titanictrain[,c(3,6)],titanictest[,c(2,5)],titanictrain$Survived,k=3)
+
+
+
+
+
+
+#####part 2 (2)
+split=0.7
+
+iristrain=iris[sample(1:dim(iris)[1],round(0.7*dim(iris)[1])),]
+iristest=iris[sample(1:dim(iris)[1],round(0.3*dim(iris)[1])),]
+
+classificationiris1=knn(iristrain[,c(1,2,3,4)],iristest[,c(1,2,3,4)],iristrain$Species,k=10,prob = TRUE)
+
+c1=confusionMatrix(table(classificationiris1,iristest$Species))
+
+c1$overall[1]
+
+
+Accuracytotall1=numeric(90)
+numk=90
+
+  for( i in 1:numk){
+    classificationiris1=knn(iristrain[,c(1,2,3,4)],iristest[,c(1,2,3,4)],iristrain$Species,k=i,prob = TRUE)
+    c1=confusionMatrix(table(classificationiris1,iristest$Species))
+    Accuracytotall1[i]=c1$overall[1]
+}
+Accuracytotall1
+
+plot(seq(1,90),Accuracytotall1,main = "Accuracy vs. K", xlab = "K", ylab = "Accuracy")
+
+####part 2 (2)
+
+
+numk=90
+Accuracytotall=numeric(90)
+
+for( i in 1:numk){
+  classificationiris=knn.cv(iris[,c(1,2,3,4)],iris$Species,k=i)
+  c=confusionMatrix(table(classificationiris,iris$Species))
+  Accuracytotall[i]=c$overall[1]
+}
+Accuracytotall
+
+plot(seq(1,90),Accuracytotall,main = "Accuracy vs. K", xlab = "K", ylab = "Accuracy")
+
+
+
